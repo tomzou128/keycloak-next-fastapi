@@ -1,0 +1,55 @@
+# Python-specific ignores
+
+# Virtual environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyd
+*.egg-info
+dist/
+build/
+*.whl
+
+# PyCharm-specific ignores
+.idea/
+*.iws
+out/
+
+# VS Code-specific ignores
+.vscode/
+*.code-workspace
+
+# General ignores
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.bak
+*.gz
+*.zip
+
+# Editor-specific files (if you use other editors)
+.idea_workspace/
+*.suo
+*.user
+
+# Sensitive data (never commit these!)
+# config.ini  # Example (customize as needed)
+# credentials.json # Example (customize as needed)
+
+# Files that should be in the repo but are updated frequently
+# (e.g., you might want to track a sample config but not the actual one)
+# config_template.ini
+
+# Installation files
+# requirements.txt
+
+# Files generated during testing
+.pytest_cache/
+htmlcov/
