@@ -1,0 +1,31 @@
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /code
+
+# Set environment variables
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit
+
+# We'll mount the source code as a volume in docker-compose
+# This is just a fallback in case the volume mount fails
+COPY . .
+
+# Ensure the src directory exists
+RUN mkdir -p /code/src/app
+
+COPY .env.development .env.development
+
+# Expose the port
+EXPOSE 3000
+
+# Health check with more frequent checks during development
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
+
+# Start the development server with hot reloading
+CMD ["npm", "run", "dev"]

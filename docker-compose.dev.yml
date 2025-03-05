@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    build:
+      context: ./next-frontend
+      dockerfile: ./next-frontend/Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./next-frontend:/app
+      - ./next-frontend/.env.development:/code/.env.development
+      - /app/node_modules   # Prevents local directory's node_modules overwrite container's node_modules.
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - api
+
+  backend:
+    build:
+      context: ./fastapi-backend
+      dockerfile: ./fastapi-backend/Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/code/app
+      - ./requirements.txt:/code/requirements.txt
+    env_file:
+      - ./fastapi-backend/.env.development
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  database:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.1
+    command:
+      - start-dev
+      - --import-realm
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./realm-exports/export:/opt/keycloak/data/import
+    env_file:
+      - .env.keycloak.dev
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ready" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
+volumes:
+  postgres_data:

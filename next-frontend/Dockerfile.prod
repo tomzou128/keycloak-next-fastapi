@@ -1,0 +1,64 @@
+# Build stage
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /code
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit
+
+# Copy source code
+COPY . .
+
+# Use the production .env file
+COPY .env.production .env.production
+COPY .env.production .env
+
+# Build the Next.js application
+ENV NEXT_OUTPUT_STANDALONE=true
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS runner
+
+# Set working directory
+WORKDIR /code
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy built application
+COPY --from=builder --chown=nextjs:nodejs /code/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /code/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /code/public ./public
+
+# Copy .env file for runtime variables
+COPY --chown=nextjs:nodejs .env.production .env
+
+# Set permissions
+RUN chown -R nextjs:nodejs /code
+
+# Run as non-root user
+USER nextjs
+
+# Expose the port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
+
+# Start the server
+CMD ["node", "server.js"]
