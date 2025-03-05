@@ -1,101 +1,104 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useSession } from "next-auth/react";
+import { Typography, Box, Paper, Button, Stack } from "@mui/material";
+import { Dashboard as DashboardIcon } from "@mui/icons-material";
+import Link from "next/link";
+import LoginButton from "@/components/auth/LoginButton";
+
+/**
+ * Home Page component
+ *
+ * This is the landing page of the application.
+ * It displays different content based on the user's authentication status.
+ *
+ * @returns The home page component
+ */
+export default function HomePage() {
+  // Get the current session
+  const { data: session, status } = useSession();
+  const isLoading = status === "loading";
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Box sx={{ mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Keycloak Integration Demo
+        </Typography>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <Typography variant="body1">
+          This application demonstrates deep integration between Keycloak, Next.js, and FastAPI.
+          Keycloak serves as the sole identity provider and JWT issuer for the application.
+        </Typography>
+
+        {isLoading ? (
+          <Typography variant="body2" color="text.secondary">
+            Loading authentication status...
+          </Typography>
+        ) : session ? (
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Welcome back, {session.user?.name || "User"}!
+            </Typography>
+
+            <Typography variant="body1">
+              You are successfully authenticated with Keycloak.
+              Your access token is being used to communicate with the FastAPI backend.
+            </Typography>
+
+            <Button
+              variant="contained"
+              component={Link}
+              href="/dashboard"
+              startIcon={<DashboardIcon />}
+              sx={{ mt: 2 }}
+            >
+              Go to Dashboard
+            </Button>
+          </Box>
+        ) : (
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Authentication Demo
+            </Typography>
+
+            <Typography variant="body1">
+              Click the login button to authenticate with Keycloak.
+              This will redirect you to the Keycloak login page.
+            </Typography>
+
+            <LoginButton />
+          </Box>
+        )}
+      </Paper>
+
+      <Paper elevation={1} sx={{ p: 3, mt: 4, borderRadius: 2 }}>
+        <Typography variant="h5" component="h2" gutterBottom>
+          About This Demo
+        </Typography>
+
+        <Typography variant="body1">
+          This application demonstrates:
+        </Typography>
+
+        <Stack component="ul" spacing={1} sx={{ pl: 4 }}>
+          <Typography component="li" variant="body1">
+            Authentication with Keycloak using OpenID Connect
+          </Typography>
+          <Typography component="li" variant="body1">
+            Token management and refresh
+          </Typography>
+          <Typography component="li" variant="body1">
+            Protected routes with NextAuth.js middleware
+          </Typography>
+          <Typography component="li" variant="body1">
+            Backend API authentication and authorization
+          </Typography>
+          <Typography component="li" variant="body1">
+            Role-based access control
+          </Typography>
+        </Stack>
+      </Paper>
+    </Box>
   );
 }
