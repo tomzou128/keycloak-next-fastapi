@@ -139,7 +139,7 @@ export default function DashboardPage() {
           </Grid>
 
           {/* Items Card */}
-          <Grid size={{ xs: 12, md: isAdmin ? 5 : 12 }}>
+          <Grid size={{ xs: 12, md: isAdmin ? 6 : 12 }}>
             <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h6">

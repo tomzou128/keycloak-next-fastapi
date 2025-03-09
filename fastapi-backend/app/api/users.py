@@ -8,7 +8,7 @@ from app.models.database import get_db
 from app.schemas.user import UserInfo, UserVO, UserUpdate
 from app.services.user_service import UserService
 
-router = APIRouter()
+router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/me", response_model=UserInfo)

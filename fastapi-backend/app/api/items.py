@@ -9,7 +9,7 @@ from app.schemas.item import Item, ItemCreate, ItemUpdate
 from app.schemas.user import UserInfo
 from app.services.item_service import ItemService
 
-router = APIRouter()
+router = APIRouter(prefix="/items", tags=["items"])
 
 
 @router.get("", response_model=List[Item])

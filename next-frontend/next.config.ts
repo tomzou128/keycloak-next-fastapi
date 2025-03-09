@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
       {
         // Proxy API requests to the backend
         source: "/api/backend/:path*",
-        destination: "http://localhost:8000/api/v1/:path*",
+        destination: "http://localhost:8000/api/:path*",
       },
     ];
   },
