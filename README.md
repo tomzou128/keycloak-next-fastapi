@@ -120,9 +120,6 @@ This option provides a complete, containerized environment using Docker Compose.
 * **Backend API:** `http://localhost:8000`
 * **Keycloak:** `http://localhost:8090`
 
-## Production Setup
-
-(Working)
 
 ## Core API Endpoints
 
